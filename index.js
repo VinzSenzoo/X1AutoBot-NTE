@@ -242,18 +242,31 @@ function deriveWalletAddress(privateKey) {
 }
 
 async function signMessageAndLogin(privateKey, address, proxy, context) {
-  const url = 'https://tapi.kod.af/signin';
-  const message = 'X1 Testnet Auth';
+  const url = 'https://testnet-api.x1.one/signin';
   const wallet = new ethers.Wallet(privateKey);
   const spinner = ora({ text: 'Signing and logging in...', spinner: 'dots' }).start();
   try {
+    const getConfig = getAxiosConfig(proxy);
+    const getUrl = `${url}?address=${address}`;
+    const getResponse = await requestWithRetry('get', getUrl, null, getConfig, 3, 2000, context);
+    const message = getResponse.data.message;
+    if (!message) {
+      throw new Error('No message received from signin GET');
+    }
+
     const signature = await wallet.signMessage(message);
-    const payload = { signature };
-    const config = getAxiosConfig(proxy);
-    const response = await requestWithRetry('post', url, payload, config, 3, 2000, context);
+
+    const payload = {
+      signature,
+      address,
+      ref_code: ""
+    };
+    const postConfig = getAxiosConfig(proxy);
+    const postResponse = await requestWithRetry('post', url, payload, postConfig, 3, 2000, context);
+
     spinner.stop();
-    if (response.data.token) {
-        return response.data.token;
+    if (postResponse.data.token) {
+      return postResponse.data.token;
     } else {
       throw new Error('Login failed: No token received');
     }
@@ -264,7 +277,7 @@ async function signMessageAndLogin(privateKey, address, proxy, context) {
 }
 
 async function getQuests(proxy, token, context) {
-  const url = 'https://tapi.kod.af/quests';
+  const url = 'https://testnet-api.x1.one/quests';
   const config = getAxiosConfig(proxy, token);
   const spinner = ora({ text: 'Fetching quests...', spinner: 'dots' }).start();
   try {
@@ -278,7 +291,7 @@ async function getQuests(proxy, token, context) {
 }
 
 async function completeQuest(questId, questName, proxy, token, context) {
-  const url = `https://tapi.kod.af/quests?quest_id=${questId}`;
+  const url = `https://testnet-api.x1.one/quests?quest_id=${questId}`;
   const config = getAxiosConfig(proxy, token);
   config.validateStatus = (status) => status >= 200 && status < 500;
   const spinner = ora({ text: `Completing quest ${questName}...`, spinner: 'dots' }).start();
@@ -343,7 +356,7 @@ async function sendDailyTx(privateKey, address, proxy, context) {
 }
 
 async function getAccountInfo(proxy, token, privateKey, context) {
-  const url = 'https://tapi.kod.af/me';
+  const url = 'https://testnet-api.x1.one/me';
   const config = getAxiosConfig(proxy, token);
   const spinner = ora({ text: 'Retrieving account info...', spinner: 'dots' }).start();
   try {
@@ -539,7 +552,7 @@ async function run() {
     space: true
   });
   console.log(gradient.retro(centerText('=== Telegram Channel 🚀 : NT Exhaust (@NTExhaust) ===', terminalWidth)));
-  console.log(gradient.retro(centerText('✪ BOT X1 EcoCHAIN AUTO DAILY✪', terminalWidth)));
+  console.log(gradient.retro(centerText('✪ BOT X1 EcoCHAIN AUTO DAILY ✪', terminalWidth)));
   console.log('\n');
   await initializeConfig();
 
