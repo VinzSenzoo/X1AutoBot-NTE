@@ -242,7 +242,7 @@ function deriveWalletAddress(privateKey) {
 }
 
 async function signMessageAndLogin(privateKey, address, proxy, context) {
-  const url = 'https://testnet-api.x1.one/signin';
+  const url = 'https://testnet-api.x1eco.com/signin';
   const wallet = new ethers.Wallet(privateKey);
   const spinner = ora({ text: 'Signing and logging in...', spinner: 'dots' }).start();
   try {
@@ -277,7 +277,7 @@ async function signMessageAndLogin(privateKey, address, proxy, context) {
 }
 
 async function getQuests(proxy, token, context) {
-  const url = 'https://testnet-api.x1.one/quests';
+  const url = 'https://testnet-api.x1eco.com/quests';
   const config = getAxiosConfig(proxy, token);
   const spinner = ora({ text: 'Fetching quests...', spinner: 'dots' }).start();
   try {
@@ -291,7 +291,7 @@ async function getQuests(proxy, token, context) {
 }
 
 async function completeQuest(questId, questName, proxy, token, context) {
-  const url = `https://testnet-api.x1.one/quests?quest_id=${questId}`;
+  const url = `https://testnet-api.x1eco.com/quests?quest_id=${questId}`;
   const config = getAxiosConfig(proxy, token);
   config.validateStatus = (status) => status >= 200 && status < 500;
   const spinner = ora({ text: `Completing quest ${questName}...`, spinner: 'dots' }).start();
@@ -310,7 +310,7 @@ async function completeQuest(questId, questName, proxy, token, context) {
 }
 
 async function claimFaucet(address, proxy, context) {
-  const url = `https://nft-api.x1.one/testnet/faucet?address=${address}`;
+  const url = `https://nft-api.x1eco.com/testnet/faucet?address=${address}`;
   const config = getAxiosConfig(proxy);
   const spinner = ora({ text: 'Claiming faucet...', spinner: 'dots' }).start();
   try {
@@ -356,7 +356,7 @@ async function sendDailyTx(privateKey, address, proxy, context) {
 }
 
 async function getAccountInfo(proxy, token, privateKey, context) {
-  const url = 'https://testnet-api.x1.one/me';
+  const url = 'https://testnet-api.x1eco.com/me';
   const config = getAxiosConfig(proxy, token);
   const spinner = ora({ text: 'Retrieving account info...', spinner: 'dots' }).start();
   try {
@@ -565,3 +565,4 @@ async function run() {
 }
 
 run().catch(error => logger.error(`Fatal error: ${error.message}`, { emoji: '❌' }));
+
